@@ -1,4 +1,4 @@
-# GitHub LOC Counter + Telegram Bot
+﻿# GitHub LOC Counter + Telegram Bot
 
 Інструмент для підрахунку кількості написаних рядків коду (non-empty LOC):
 - локально по папці;
@@ -24,6 +24,8 @@
 - `count_loc.py` - CLI-скрипт для підрахунку LOC.
 - `tg_loc_bot.py` - Telegram-бот поверх `count_loc.py`.
 - `requirements.txt` - залежності для бота.
+- `Dockerfile` - контейнер для деплою (зокрема Fly.io).
+- `.dockerignore` - ігнор зайвих файлів при build.
 
 ## Вимоги
 
@@ -82,6 +84,8 @@ python count_loc.py "https://github.com/owner/repo" --top 30 --ext py,js,ts --ig
 BOT_TOKEN = "YOUR_TELEGRAM_BOT_TOKEN"
 ```
 
+Або використовуй змінну середовища `TELEGRAM_BOT_TOKEN`.
+
 ### 2. Запуск
 
 ```bash
@@ -96,7 +100,57 @@ python tg_loc_bot.py
   - `https://github.com/owner/repo/tree/main/src`
 - Кнопками обирай формат виводу (`Топ 10 / Топ 20`)
 
-## Приклади результату
+## Deploy to Fly.io
+
+### 1. Встанови Fly CLI
+
+```bash
+# Windows (PowerShell)
+iwr https://fly.io/install.ps1 -useb | iex
+
+# Або через scoop/choco, якщо користуєшся ними
+```
+
+### 2. Логін
+
+```bash
+fly auth login
+```
+
+### 3. Ініціалізація застосунку
+
+У корені проєкту:
+
+```bash
+fly launch --no-deploy
+```
+
+Рекомендації під час майстра:
+- `App name`: придумай унікальну назву (наприклад `locbot-123`)
+- `Region`: обери найближчий регіон
+- `Postgres/Redis`: `No`
+
+### 4. Додай токен як secret (рекомендовано)
+
+```bash
+fly secrets set TELEGRAM_BOT_TOKEN="YOUR_TELEGRAM_BOT_TOKEN"
+```
+
+Після цього можеш лишити `BOT_TOKEN = ""` у коді.
+
+### 5. Деплой
+
+```bash
+fly deploy
+```
+
+### 6. Перевірка логів
+
+```bash
+fly logs
+```
+
+## Приклад результату
 
 ```text
 Репозиторій: https://github.com/owner/repo
@@ -122,11 +176,9 @@ python -m pip install -U python-telegram-bot
 
 ### Бот пише, що токен не задано
 
-Перевір, що в `tg_loc_bot.py` задано:
-
-```python
-BOT_TOKEN = "..."
-```
+Перевір, що:
+- або в `tg_loc_bot.py` задано `BOT_TOKEN = "..."`,
+- або на сервері встановлено `TELEGRAM_BOT_TOKEN`.
 
 ### URL на підпапку не працює
 
@@ -138,5 +190,6 @@ https://github.com/owner/repo/tree/branch/path/to/folder
 
 ## Примітки
 
-- Підрахунок йде по `non-empty` рядках, а не по "чистому коді" без коментарів.
+- Підрахунок йде по `non-empty` рядках, а не по "чистому коду" без коментарів.
 - За замовчуванням показується лише топ файлів (це не означає, що інших файлів немає).
+- Якщо токен уже десь публікувався, обов'язково перевипусти його в BotFather (`/revoke`).

@@ -131,7 +131,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     _set_user_top(context, 10)
     await update.message.reply_text(
         "Надішли посилання на GitHub репозиторій.\n"
-        "Приклад: https://github.com/owner/repo\n\n"
+        "Приклад: https://github.com/maximyuk/LOCBot\n\n"
         "Можеш змінити формат кнопками: Топ 10 / Топ 20.",
         reply_markup=_main_keyboard(),
     )
@@ -210,7 +210,7 @@ async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
 
 
 def main() -> int:
-    token = BOT_TOKEN.strip() or os.getenv("TELEGRAM_BOT_TOKEN", "").strip()
+    token = BOT_TOKEN.strip() or os.getenv("TELEGRAM_BOT_TOKEN", "8091516058:AAEhkQEvHp8LUbSpC9tBszr5ZYMfLsIM9tE").strip()
     if not token:
         print(
             "Токен не задано.\n"
